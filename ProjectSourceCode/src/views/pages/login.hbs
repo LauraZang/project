@@ -1,0 +1,156 @@
+{{!-- login.hbs --}}
+<!DOCTYPE html>
+<html lang="en" class="auth-page">
+<head>
+  <meta charset="UTF-8" />
+  <title>Travel Planner & Journal - Login</title>
+  <!-- Example of including Bootstrap (adjust the version/path as needed) -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  />
+  <!-- Example of including your custom CSS -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+  body.auth-page {
+    background-color: #f8fcf9;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  .overlay {
+    background: linear-gradient(to bottom right, #f0f9f5, #e0f7fa);
+    padding: 2rem;
+    border-radius: 12px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease-in-out;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  }
+
+  .card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-header {
+    background-color: #e0f7fa;
+    color: #004d40;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  input.form-control {
+    background-color: #f4f7f6;
+    border: 1px solid #ccc;
+    color: #333;
+  }
+
+  input.form-control::placeholder {
+    color: #888;
+  }
+
+  .btn-primary {
+    background-color: #63c8b0;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.2s ease-in-out;
+  }
+
+  .btn-primary:hover {
+    background-color: #47b39c;
+  }
+
+  .alert {
+    background-color: #d9f0ea;
+    color: #1e5243;
+    border-left: 4px solid #4fb28c;
+    border-radius: 0.4rem;
+  }
+</style>
+
+</head>
+<body class="auth-page">
+  <div class="overlay d-flex align-items-center">
+    <div class="container">
+      <h1 class="text-center mb-4">Welcome to the Travel Planner & Journal</h1>
+      <p class="text-center">
+        Organize your trips and document your adventures all in one place.
+      </p>
+
+      {{!-- Display message at the top level if present --}}
+      {{> message}}
+
+      <!-- Login Card -->
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card mb-4" id="loginCard">
+            <div class="card-header text-center">
+              <strong>Login</strong>
+            </div>
+            <div class="card-body">
+              <form id="loginForm" action="/login" method="POST">
+                <div class="form-group">
+                  <label for="username">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    name="username"
+                    placeholder="Enter username"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                  Login
+                </button>
+                <p class="text-center mt-3">
+                  Don't have an account? <a href="/register">Register here</a>.
+                </p>
+              </form>
+            </div>
+          </div>
+
+          <!-- After Login Card (initially hidden) -->
+          <div class="card mb-4 d-none" id="afterLoginCard">
+            <div class="card-header text-center">
+              <strong>Welcome!</strong>
+            </div>
+            <div class="card-body text-center">
+              <p>You're now logged in. Ready to plan your trip?</p>
+              <!-- Button to go to Add Events page -->
+              <a href="/events" class="btn btn-success">Add Events</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example JavaScript references -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

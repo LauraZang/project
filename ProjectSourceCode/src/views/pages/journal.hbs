@@ -1,0 +1,191 @@
+{{#if message}}
+  <div id="flash-message" class="alert alert-info text-center p-3 my-3 rounded shadow-sm" 
+       style="max-width: 600px; margin: 0 auto;">
+    ✈️ {{message}}
+  </div>
+{{/if}}
+
+<main class="container p-4 rounded shadow-sm" style="background-color: #ffffff;">
+  <h2 class="page-title mb-4">Travel Journal</h2>
+
+<style>
+  body {
+    background-color: #f8fcf9;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #000;
+  }
+
+  .container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
+  }
+
+  h2.page-title {
+    margin-top: 0;
+    text-align: center;
+    font-weight: bold;
+    color: #004d40;
+    font-size: 2rem;
+  }
+
+  .form-control {
+    background-color: #f4f7f6;
+    border: 1px solid #ccc;
+    color: #333;
+  }
+
+  .form-control::placeholder {
+    color: #888;
+  }
+
+  .btn-info {
+    background-color: #63c8b0;
+    border: none;
+    font-weight: 600;
+  }
+
+  .btn-info:hover {
+    background-color: #47b39c;
+  }
+
+  .alert-info {
+    background-color: #e8f9f3;
+    color: #1c5d4c;
+    border-left: 4px solid #4fb28c;
+  }
+
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .modal-content {
+    border-radius: 10px;
+  }
+</style>
+
+
+  <!-- Trip Selection -->
+  <form method="GET" action="/journal" class="mb-4 p-3 rounded shadow-sm" style="background-color: #f0f8ff;">
+    <label for="trip-select" class="form-label fw-bold">Select a Trip:</label>
+    <select name="tripId" id="trip-select" class="form-select mb-2" required>
+      <option value="" disabled selected>-- Please select a trip --</option>
+      {{#each trips}}
+        <option value="{{this.id}}" {{#if (eq ../selectedTripId this.id)}}selected{{/if}}>
+          {{this.trip_name}} — {{this.city}}, {{this.country}} ({{formatDate this.date_start}})
+        </option>
+      {{/each}}
+    </select>
+    <button type="submit" class="btn btn-info">View</button>
+  </form>
+
+  <!-- Show Journal Entries -->
+  {{#if journalData.length}}
+    {{#each journalData}}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <p class="card-text">{{this.comments}}</p>
+
+          {{#if this.images.length}}
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              {{#each this.images}}
+                <img src="{{this.image_url}}" alt="Uploaded photo" class="img-thumbnail me-2 mb-2" style="max-width: 200px;" />
+              {{/each}}
+            </div>
+          {{/if}}
+
+          <!-- Edit & Delete buttons -->
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#editModal-{{this.journal_id}}">Edit</button>
+            <form action="/journal/delete" method="POST" class="d-inline">
+              <input type="hidden" name="journalId" value="{{this.journal_id}}" />
+              <input type="hidden" name="tripId" value="{{../selectedTripId}}" />
+              <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this journal?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Modal -->
+      <div class="modal fade" id="editModal-{{this.journal_id}}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel-{{this.journal_id}}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <form action="/journal/edit" method="POST" enctype="multipart/form-data">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel-{{this.journal_id}}">Edit Journal Entry</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" name="journalId" value="{{this.journal_id}}" />
+                <input type="hidden" name="tripId" value="{{../selectedTripId}}" />
+
+                <div class="form-group mb-3">
+                  <label for="comment">Journal Entry:</label>
+                  <textarea class="form-control" name="comment" rows="4" required>{{this.comments}}</textarea>
+                </div>
+
+                <div class="form-group mb-2">
+                  <label for="photo">Upload New Photo (optional):</label>
+                  <input type="file" name="photos" class="form-control" accept="image/*" multiple />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-info">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+
+  {{else if selectedTripId}}
+    <div class="alert alert-info text-center">No journal entries yet for this trip. Add one below!</div>
+
+    <!-- Add Journal Form -->
+    <form action="/journal/add" method="POST" enctype="multipart/form-data" class="mt-4 p-3 border rounded bg-light">
+      <input type="hidden" name="tripId" value="{{selectedTripId}}" />
+
+      <div class="form-group mb-3">
+        <label for="comment" class="form-label">Journal Entry:</label>
+        <textarea class="form-control" name="comment" id="comment" rows="4" required></textarea>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="photos" class="form-label">Upload Photo (optional):</label>
+        <input type="file" name="photos" class="form-control" accept="image/*" multiple />
+      </div>
+
+      <button type="submit" class="btn btn-success">Add Journal Entry</button>
+    </form>
+
+  {{else}}
+    <div class="alert alert-info text-center">
+      Please select a trip to view or add journal entries.
+    </div>
+  {{/if}}
+</main>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const flash = document.getElementById('flash-message');
+    if (flash) {
+      setTimeout(() => {
+        flash.style.transition = 'opacity 0.5s ease-out';
+        flash.style.opacity = '0';
+
+        setTimeout(() => {
+          if (flash.parentNode) {
+            flash.parentNode.removeChild(flash);
+          }
+        }, 500);
+      }, 1500); // 3 seconds
+    }
+  });
+</script>
